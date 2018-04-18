@@ -2,22 +2,17 @@ from flask import Flask
 from flask import jsonify
 from flask import request
 from pymongo import MongoClient
+from mongoengine import *
 
 app = Flask(__name__)
 
 
-units = [
-{
-    'name':'kilometer',
-'code':'km'
-},
-{
-    'name':'minute',
-    'code':'min'
-}]
-
 client = MongoClient()
 db = client.units
+
+
+class Unit(Document):
+    name = StringField(required=True, max_length=200)
 
 
 @app.route("/")
@@ -26,56 +21,87 @@ def hello():
 
 
 # TO DO : GET Units
-@app.route('/units',methods=['GET'])
+@app.route('/units', methods=['GET'])
 def getAllUnits():
     res = db.units.find({})
     units = []
+
     for unit in res:
         units.append(str(unit))
 
-    res_unit = jsonify({'units':units})
-
-    return res_unit
+    return jsonify({'units': units})
 
 
 # TO DO : GET SportType
-@app.route('/sports',methods=['GET'])
+@app.route('/sports', methods=['GET'])
 def getAllSports():
     res = db.sports.find({})
     sports = []
+
     for sport in res:
         sports.append(str(sport))
 
-    res_sport = jsonify({"sports":sports})
-    return res_sport
+    return jsonify({"sports": sports})
 
 
 # TO DO : GET Session with specific id
-@app.route('/sessions/<id>',methods=['GET'])
-def getAllSessionsOfUser():
+@app.route('/sessions/<user>', methods=['GET'])
+def getAllSessionsOfUser(user):
+    user_id = db.users.find({'name': user})
+    res = db.sessions.find({'user_id': user_id})
     sessions = []
-    return sessions
+
+    for session in res:
+        sessions.append(str(session))
+
+    return jsonify(sessions)
 
 
-@app.route('/units',methods=['POST'])
+@app.route('/units', methods=['POST'])
 def createUnit():
     unit = {
-    'id':request.json['id'],
-    'name':request.json['name'],
-    'code':request.json['code']
+        'id': request.json['id'],
+        'name': request.json['name'].lower(),
+        'code': request.json['code'].lower()
     }
     db.units.insert(unit)
     return getAllUnits()
 
 
-@app.route('/sports',methods=['POST'])
+@app.route('/sports', methods=['POST'])
 def createSport():
     sport = {
-    'id':request.json['id'],
-    'name':request.json['name']
+        'id': request.json['id'],
+        'name': request.json['name'].lower()
     }
     db.sports.insert(sport)
     return getAllSports()
+
+
+@app.route('/sessions/<user>', methods=['POST'])
+def createSession(user):
+    sport_id = db.sports.find({'name': request.json['sport_name']}).sport_id
+    unit_id = db.units.find({'code': request.json['unit_code']}).unit_id
+    user_id = db.users.find({'name': user}).user_id
+
+    session = {
+        'id': request.json['id'],
+        'sport_id': sport_id,
+        'quantity': request.json['quantity'].lower(),
+        'unit_id': unit_id,
+        'user_id': user_id
+    }
+    db.sessions.insert(session)
+
+    return getAllSessionsOfUser(user)
+
+
+@app.route('/users', methods=['POST'])
+def createUser():
+    user = {
+            'name': request.json['name'],
+            'mail': request.json['mail'],
+            }
 
 
 if __name__ == '__main__':
