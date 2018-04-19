@@ -7,10 +7,6 @@ from mongoengine import *
 app = Flask(__name__)
 
 
-client = MongoClient()
-db = client.units
-
-
 class Unit(Document):
     name = StringField(required=True, max_length=200)
 
@@ -23,6 +19,8 @@ def hello():
 # TO DO : GET Units
 @app.route('/units', methods=['GET'])
 def getAllUnits():
+    client = MongoClient()
+    db = client.fitness
     res = db.units.find({})
     units = []
 
@@ -35,6 +33,8 @@ def getAllUnits():
 # TO DO : GET SportType
 @app.route('/sports', methods=['GET'])
 def getAllSports():
+    client = MongoClient()
+    db = client.fitness
     res = db.sports.find({})
     sports = []
 
@@ -47,6 +47,8 @@ def getAllSports():
 # TO DO : GET Session with specific id
 @app.route('/sessions/<user>', methods=['GET'])
 def getAllSessionsOfUser(user):
+    client = MongoClient()
+    db = client.fitness
     user_id = db.users.find({'name': user})
     res = db.sessions.find({'user_id': user_id})
     sessions = []
@@ -59,6 +61,8 @@ def getAllSessionsOfUser(user):
 
 @app.route('/units', methods=['POST'])
 def createUnit():
+    client = MongoClient()
+    db = client.fitness
     unit = {
         'id': request.json['id'],
         'name': request.json['name'].lower(),
@@ -70,6 +74,8 @@ def createUnit():
 
 @app.route('/sports', methods=['POST'])
 def createSport():
+    client = MongoClient()
+    db = client.fitness
     sport = {
         'id': request.json['id'],
         'name': request.json['name'].lower()
@@ -80,6 +86,8 @@ def createSport():
 
 @app.route('/sessions/<user>', methods=['POST'])
 def createSession(user):
+    client = MongoClient()
+    db = client.fitness
     sport_id = db.sports.find({'name': request.json['sport_name']}).sport_id
     unit_id = db.units.find({'code': request.json['unit_code']}).unit_id
     user_id = db.users.find({'name': user}).user_id
@@ -98,10 +106,14 @@ def createSession(user):
 
 @app.route('/users', methods=['POST'])
 def createUser():
+    client = MongoClient()
+    db = client.fitness
     user = {
             'name': request.json['name'],
             'mail': request.json['mail'],
             }
+    db.users.insert(user)
+    return user
 
 
 if __name__ == '__main__':
