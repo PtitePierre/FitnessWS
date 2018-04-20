@@ -143,7 +143,6 @@ def createSport():
         'name': request.json['name'].lower(),
     }
     units = request.json['units']
-    print(units)
 
     db = connect()
     cursor = db.cursor()
@@ -163,6 +162,7 @@ def createSport():
 
         for unit in units:
             unit_id = unit['unit_id']
+            print(sport_id)
             sql = "INSERT INTO sport_unit(sport_id, unit_id) \
                VALUES ('%d', '%d')" % (sport_id, unit_id)
             try:
