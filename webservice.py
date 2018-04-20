@@ -167,7 +167,10 @@ def createSport():
                 db.commit()
             except:
                 db.rollback()
-    except:
+    except Exception as inst:
+        print(type(inst))
+        print(inst.args)
+        print(inst)
         print("Error: unable to insert links between sport & unit")
 
     db.close()
