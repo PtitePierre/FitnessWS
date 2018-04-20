@@ -154,7 +154,7 @@ def createSport():
     db = connect()
     cursor = db.cursor()
     sql = "INSERT INTO Sport(NAME) \
-       VALUES ('%s', '%s')" % (sport['name'])
+       VALUES ('%s')" % (sport['name'])
     try:
         # Execute the SQL command
         cursor.execute(sql)
