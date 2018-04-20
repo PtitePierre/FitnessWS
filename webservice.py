@@ -43,7 +43,7 @@ def getAllUnits():
     db = connect()
     cursor = db.cursor()
 
-    sql = "SELECT * FROM UNIT"
+    sql = "SELECT * FROM Unit"
     try:
         # Execute the SQL command
         cursor.execute(sql)
@@ -70,7 +70,7 @@ def getAllUnits():
 def getAllSports():
     db = connect()
     cursor = db.cursor()
-    sql = "SELECT * FROM SPORT"
+    sql = "SELECT * FROM Sport"
 
     sports = []
     try:
@@ -99,7 +99,7 @@ def getAllSessionsOfUser(user):
     userid = ""
     db = connect()
     cursor = db.cursor()
-    sql = "SELECT * FROM SESSION WHERE USERID = '%d'" % (userid)
+    sql = "SELECT * FROM Session WHERE USERID = '%d'" % (userid)
     sessions = []
     try:
         # Execute the SQL command
@@ -129,7 +129,7 @@ def createUnit():
     }
     db = connect()
     cursor = db.cursor()
-    sql = "INSERT INTO UNIT(NAME, CODE) \
+    sql = "INSERT INTO Unit(NAME, CODE) \
        VALUES ('%s', '%s')" % (unit['name'], unit['code'])
     try:
         # Execute the SQL command
@@ -153,7 +153,7 @@ def createSport():
     }
     db = connect()
     cursor = db.cursor()
-    sql = "INSERT INTO SPORT(NAME) \
+    sql = "INSERT INTO Sport(NAME) \
        VALUES ('%s', '%s')" % (sport['name'])
     try:
         # Execute the SQL command
@@ -186,7 +186,7 @@ def createSession(user):
     }
     db = connect()
     cursor = db.cursor()
-    sql = "INSERT INTO SESSION(NAME) \
+    sql = "INSERT INTO Session(NAME) \
        VALUES ('%s', '%s')" % (session['name'])
     try:
         # Execute the SQL command
@@ -211,7 +211,7 @@ def createUser():
             }
     db = connect()
     cursor = db.cursor()
-    sql = "INSERT INTO USER(NAME, EMAIL) \
+    sql = "INSERT INTO User(NAME, EMAIL) \
        VALUES ('%s', '%s')" % (user['name'], user['email'])
     try:
         # Execute the SQL command
