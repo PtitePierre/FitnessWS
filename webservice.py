@@ -162,9 +162,9 @@ def createSport():
         sport_id = cursor.fetchone()
 
         for unit in units:
-            print(unit['unit_id'])
+            unit_id = unit['unit_id']
             sql = "INSERT INTO sport_unit(sport_id, unit_id) \
-               VALUES ('%d', '%d')" % (sport_id, unit['unit_id'])
+               VALUES ('%d', '%d')" % (sport_id, unit_id)
             try:
                 cursor.execute(sql)
                 db.commit()
