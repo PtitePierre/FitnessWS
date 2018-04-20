@@ -57,7 +57,7 @@ def getAllUnits():
             }
             units.append(unit)
     except:
-        print("Error: unable to fecth data")
+        print("Error: unable to fecth data in unit")
 
     # disconnect from server
     db.close()
@@ -74,10 +74,9 @@ def getAllSports():
 
     sports = []
     try:
-        # Execute the SQL command
         cursor.execute(sql)
-        # Fetch all the rows in a list of lists.
         results = cursor.fetchall()
+
         for row in results:
             sport = {
                 'id': row[0],
@@ -85,11 +84,9 @@ def getAllSports():
             }
             sports.append(sport)
     except:
-        print("Error: unable to fecth data")
+        print("Error: unable to fecth data in sport")
 
-    # disconnect from server
     db.close()
-
     return jsonify({"sports": sports})
 
 
@@ -101,11 +98,11 @@ def getAllSessionsOfUser(user):
     cursor = db.cursor()
     sql = "SELECT * FROM session WHERE user_id = '%d'" % (userid)
     sessions = []
+
     try:
-        # Execute the SQL command
         cursor.execute(sql)
-        # Fetch all the rows in a list of lists.
         results = cursor.fetchall()
+
         for row in results:
             session = {
                 'id': row[0],
@@ -113,11 +110,9 @@ def getAllSessionsOfUser(user):
             }
             sessions.append(session)
     except:
-        print("Error: unable to fecth data")
+        print("Error: unable to fecth data in session")
 
-    # disconnect from server
     db.close()
-
     return jsonify(sessions)
 
 
@@ -132,17 +127,13 @@ def createUnit():
     sql = "INSERT INTO unit(name, code) \
        VALUES ('%s', '%s')" % (unit['name'], unit['code'])
     try:
-        # Execute the SQL command
         cursor.execute(sql)
-        # Commit your changes in the database
         db.commit()
     except:
-        # Rollback in case there is any error
         db.rollback()
+        print("Error: unable to insert unit")
 
-    # disconnect from server
     db.close()
-
     return getAllUnits()
 
 
@@ -154,39 +145,31 @@ def createSport():
     }
     db = connect()
     cursor = db.cursor()
-    sql = "INSERT INTO sport(name) \
+    insert = "INSERT INTO sport(name) \
        VALUES ('%s')" % (sport['name'])
     try:
-        # Execute the SQL command
-        cursor.execute(sql)
-        # Commit your changes in the database
+        cursor.execute(insert)
         db.commit()
     except:
-        # Rollback in case there is any error
         db.rollback()
+        print("Error: unable to insert sport")
 
-    sql = "SELECT id FROM sport WHERE name LIKE '%s'" % (sport['name'])
+    get_sport = "SELECT id FROM sport WHERE name LIKE '%s'" % (sport['name'])
     try:
-        # Execute the SQL command
-        cursor.execute(sql)
-        # Fetch all the rows in a list of lists.
+        cursor.execute(get_sport)
         sport_id = cursor.fetch_row()
 
         for unit in sport['units']:
             sql = "INSERT INTO sport_unit(sport_id, unit_id) \
                VALUES ('%d', '%d')" % (sport_id, unit)
             try:
-                # Execute the SQL command
                 cursor.execute(sql)
-                # Commit your changes in the database
                 db.commit()
             except:
-                # Rollback in case there is any error
                 db.rollback()
     except:
-        print("Error: unable to fecth data")
+        print("Error: unable to insert links between sport & unit")
 
-    # disconnect from server
     db.close()
 
     return getAllSports()
