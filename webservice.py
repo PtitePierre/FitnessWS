@@ -13,11 +13,8 @@ def connect():
     host = "psotty.mysql.pythonanywhere-services.com"
     user = "psotty"
     pswd = ""
-    # or psotty$fitness
     database = "psotty$fitness"
-    """
-    db = MySQLdb.connect(host, user, pswd, database)
-    """
+
     mysql = MySQL()
 
     # MySQL configurations
@@ -162,7 +159,6 @@ def createSport():
 
         for unit in units:
             unit_id = unit['unit_id']
-            print(sport_id)
             sql = "INSERT INTO sport_unit(sport_id, unit_id) \
                VALUES ('%d', '%d')" % (sport_id, unit_id)
             try:
