@@ -43,7 +43,7 @@ def getAllUnits():
     db = connect()
     cursor = db.cursor()
 
-    sql = "SELECT * FROM Unit"
+    sql = "SELECT * FROM unit"
     try:
         # Execute the SQL command
         cursor.execute(sql)
@@ -70,7 +70,7 @@ def getAllUnits():
 def getAllSports():
     db = connect()
     cursor = db.cursor()
-    sql = "SELECT * FROM Sport"
+    sql = "SELECT * FROM sport"
 
     sports = []
     try:
@@ -96,10 +96,10 @@ def getAllSports():
 # TO DO : GET Session with specific id
 @app.route('/sessions/<user>', methods=['GET'])
 def getAllSessionsOfUser(user):
-    userid = ""
+    userid = request.json['id']  # or user ~
     db = connect()
     cursor = db.cursor()
-    sql = "SELECT * FROM Session WHERE USERID = '%d'" % (userid)
+    sql = "SELECT * FROM session WHERE user_id = '%d'" % (userid)
     sessions = []
     try:
         # Execute the SQL command
@@ -129,7 +129,7 @@ def createUnit():
     }
     db = connect()
     cursor = db.cursor()
-    sql = "INSERT INTO Unit(NAME, CODE) \
+    sql = "INSERT INTO unit(name, code) \
        VALUES ('%s', '%s')" % (unit['name'], unit['code'])
     try:
         # Execute the SQL command
@@ -153,7 +153,7 @@ def createSport():
     }
     db = connect()
     cursor = db.cursor()
-    sql = "INSERT INTO Sport(NAME) \
+    sql = "INSERT INTO sport(name) \
        VALUES ('%s')" % (sport['name'])
     try:
         # Execute the SQL command
@@ -166,6 +166,8 @@ def createSport():
 
     # disconnect from server
     db.close()
+    
+    links = []
 
     return getAllSports()
 
@@ -186,7 +188,7 @@ def createSession(user):
     }
     db = connect()
     cursor = db.cursor()
-    sql = "INSERT INTO Session(NAME) \
+    sql = "INSERT INTO session(name) \
        VALUES ('%s', '%s')" % (session['name'])
     try:
         # Execute the SQL command
@@ -211,7 +213,7 @@ def createUser():
             }
     db = connect()
     cursor = db.cursor()
-    sql = "INSERT INTO User(NAME, EMAIL) \
+    sql = "INSERT INTO user(name, email) \
        VALUES ('%s', '%s')" % (user['name'], user['email'])
     try:
         # Execute the SQL command
