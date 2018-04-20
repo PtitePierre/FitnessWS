@@ -14,7 +14,7 @@ def connect():
     user = "psotty"
     pswd = ""
     # or psotty$fitness
-    database = "fitness"
+    database = "psotty$fitness"
     """
     db = MySQLdb.connect(host, user, pswd, database)
     """
