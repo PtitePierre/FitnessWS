@@ -149,7 +149,8 @@ def createUnit():
 @app.route('/sports', methods=['POST'])
 def createSport():
     sport = {
-        'name': request.json['name'].lower()
+        'name': request.json['name'].lower(),
+        'units': request.json['units']
     }
     db = connect()
     cursor = db.cursor()
@@ -164,10 +165,29 @@ def createSport():
         # Rollback in case there is any error
         db.rollback()
 
+    sql = "SELECT id FROM sport WHERE name LIKE '%s'" % (sport['name'])
+    try:
+        # Execute the SQL command
+        cursor.execute(sql)
+        # Fetch all the rows in a list of lists.
+        sport_id = cursor.fetch_row()
+
+        for unit in sport['units']:
+            sql = "INSERT INTO sport_unit(sport_id, unit_id) \
+               VALUES ('%d', '%d')" % (sport_id, unit)
+            try:
+                # Execute the SQL command
+                cursor.execute(sql)
+                # Commit your changes in the database
+                db.commit()
+            except:
+                # Rollback in case there is any error
+                db.rollback()
+    except:
+        print("Error: unable to fecth data")
+
     # disconnect from server
     db.close()
-    
-    links = []
 
     return getAllSports()
 
