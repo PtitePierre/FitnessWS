@@ -141,8 +141,9 @@ def createUnit():
 def createSport():
     sport = {
         'name': request.json['name'].lower(),
-        'units': request.json['units']
     }
+    units = request.json['units']
+
     db = connect()
     cursor = db.cursor()
     insert = "INSERT INTO sport(name) \
@@ -159,7 +160,7 @@ def createSport():
         cursor.execute(get_sport)
         sport_id = cursor.fetchone()
 
-        for unit in sport['units']:
+        for unit in units:
             sql = "INSERT INTO sport_unit(sport_id, unit_id) \
                VALUES ('%d', '%d')" % (sport_id, unit['unit_id'])
             try:
@@ -168,9 +169,7 @@ def createSport():
             except:
                 db.rollback()
     except Exception as inst:
-        print(type(inst))
         print(inst.args)
-        print(inst)
         print("Error: unable to insert links between sport & unit")
 
     db.close()
