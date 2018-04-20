@@ -157,7 +157,7 @@ def createSport():
     get_sport = "SELECT id FROM sport WHERE name LIKE '%s'" % (sport['name'])
     try:
         cursor.execute(get_sport)
-        sport_id = cursor.fetch_row()
+        sport_id = cursor.fetch()
 
         for unit in sport['units']:
             sql = "INSERT INTO sport_unit(sport_id, unit_id) \
