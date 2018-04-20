@@ -1,7 +1,8 @@
 from flask import Flask
 from flask import jsonify
 from flask import request
-import MySQLdb
+# import MySQLdb
+from flask.ext.mysql import MySQL
 
 
 app = Flask(__name__)
@@ -14,7 +15,19 @@ def connect():
     pswd = ""
     # or psotty$fitness
     database = "fitness"
+    """
     db = MySQLdb.connect(host, user, pswd, database)
+    """
+    mysql = MySQL()
+
+    # MySQL configurations
+    app.config['MYSQL_DATABASE_USER'] = user
+    app.config['MYSQL_DATABASE_PASSWORD'] = pswd
+    app.config['MYSQL_DATABASE_DB'] = database
+    app.config['MYSQL_DATABASE_HOST'] = host
+    mysql.init_app(app)
+    db = mysql.connect()
+
     return db
 
 
@@ -136,7 +149,6 @@ def createUnit():
 @app.route('/sports', methods=['POST'])
 def createSport():
     sport = {
-        'id': request.json['id'],
         'name': request.json['name'].lower()
     }
     db = connect()
