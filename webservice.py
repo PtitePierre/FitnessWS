@@ -4,29 +4,18 @@ from flask import request
 import MySQLdb
 
 
+app = Flask(__name__)
+
+
 def connect():
     """connect user to DataBase on host"""
-    db = MySQLdb.connect("host","user","pswd","DataBase")
+    host = "psotty.mysql.pythonanywhere-services.com"
+    user = "psotty"
+    pswd = ""
+    # or psotty$fitness
+    database = "fitness"
+    db = MySQLdb.connect(host, user, pswd, database)
     return db
-
-def insertUnit(u_name, u_code):
-    db = connect()
-    cursor = db.cursor()
-    sql = "INSERT INTO UNIT(NAME, \
-       CODE) \
-       VALUES ('%s', '%s')" % \
-       (u_name, u_code)
-    try:
-       # Execute the SQL command
-       cursor.execute(sql)
-       # Commit your changes in the database
-       db.commit()
-    except:
-       # Rollback in case there is any error
-       db.rollback()
-
-    # disconnect from server
-    db.close()
 
 
 @app.route("/")
@@ -37,36 +26,29 @@ def hello():
 # TO DO : GET Units
 @app.route('/units', methods=['GET'])
 def getAllUnits():
+    units = []
     db = connect()
     cursor = db.cursor()
 
     sql = "SELECT * FROM UNIT"
     try:
-       # Execute the SQL command
-       cursor.execute(sql)
-       # Fetch all the rows in a list of lists.
-       results = cursor.fetchall()
-        units = []
-       for row in results:        
+        # Execute the SQL command
+        cursor.execute(sql)
+        # Fetch all the rows in a list of lists.
+        results = cursor.fetchall()
+        for row in results:
             unit = {
-                'name': row[0],
-                'code': row[1]
+                'id': row[0],
+                'name': row[1],
+                'code': row[2]
             }
             units.append(unit)
     except:
-       print "Error: unable to fecth data"
+        print("Error: unable to fecth data")
 
     # disconnect from server
     db.close()
-    """
-    client = MongoClient()
-    db = client.fitness
-    res = db.units.find({})
-    units = []
 
-    for unit in res:
-        units.append(str(unit))
-    """
     return jsonify({'units': units})
 
 
@@ -76,34 +58,52 @@ def getAllSports():
     db = connect()
     cursor = db.cursor()
     sql = "SELECT * FROM SPORT"
-    """
-    client = MongoClient()
-    db = client.fitness
-    res = db.sports.find({})
-    """
-    sports = []
 
-    for sport in res:
-        sports.append(str(sport))
+    sports = []
+    try:
+        # Execute the SQL command
+        cursor.execute(sql)
+        # Fetch all the rows in a list of lists.
+        results = cursor.fetchall()
+        for row in results:
+            sport = {
+                'id': row[0],
+                'name': row[1],
+            }
+            sports.append(sport)
+    except:
+        print("Error: unable to fecth data")
+
+    # disconnect from server
+    db.close()
+
     return jsonify({"sports": sports})
 
 
 # TO DO : GET Session with specific id
 @app.route('/sessions/<user>', methods=['GET'])
 def getAllSessionsOfUser(user):
+    userid = ""
     db = connect()
     cursor = db.cursor()
-    sql = "SELECT * FROM SESSION WHERE USERID = '%d'" %(userid)
-    """
-    client = MongoClient()
-    db = client.fitness
-    user_id = db.users.find({'name': user})
-    res = db.sessions.find({'user_id': user_id})
-    """
+    sql = "SELECT * FROM SESSION WHERE USERID = '%d'" % (userid)
     sessions = []
+    try:
+        # Execute the SQL command
+        cursor.execute(sql)
+        # Fetch all the rows in a list of lists.
+        results = cursor.fetchall()
+        for row in results:
+            session = {
+                'id': row[0],
+                'name': row[1],
+            }
+            sessions.append(session)
+    except:
+        print("Error: unable to fecth data")
 
-    for session in res:
-        sessions.append(str(session))
+    # disconnect from server
+    db.close()
 
     return jsonify(sessions)
 
@@ -111,11 +111,25 @@ def getAllSessionsOfUser(user):
 @app.route('/units', methods=['POST'])
 def createUnit():
     unit = {
-        'id': request.json['id'],
         'name': request.json['name'].lower(),
         'code': request.json['code'].lower()
     }
-    db.units.insert(unit)
+    db = connect()
+    cursor = db.cursor()
+    sql = "INSERT INTO UNIT(NAME, CODE) \
+       VALUES ('%s', '%s')" % (unit['name'], unit['code'])
+    try:
+        # Execute the SQL command
+        cursor.execute(sql)
+        # Commit your changes in the database
+        db.commit()
+    except:
+        # Rollback in case there is any error
+        db.rollback()
+
+    # disconnect from server
+    db.close()
+
     return getAllUnits()
 
 
@@ -125,16 +139,32 @@ def createSport():
         'id': request.json['id'],
         'name': request.json['name'].lower()
     }
-    db.sports.insert(sport)
+    db = connect()
+    cursor = db.cursor()
+    sql = "INSERT INTO SPORT(NAME) \
+       VALUES ('%s', '%s')" % (sport['name'])
+    try:
+        # Execute the SQL command
+        cursor.execute(sql)
+        # Commit your changes in the database
+        db.commit()
+    except:
+        # Rollback in case there is any error
+        db.rollback()
+
+    # disconnect from server
+    db.close()
+
     return getAllSports()
 
 
 @app.route('/sessions/<user>', methods=['POST'])
 def createSession(user):
+    """
     sport_id = db.sports.find({'name': request.json['sport_name']}).sport_id
     unit_id = db.units.find({'code': request.json['unit_code']}).unit_id
     user_id = db.users.find({'name': user}).user_id
-
+    """
     session = {
         'id': request.json['id'],
         'sport_id': sport_id,
@@ -142,7 +172,21 @@ def createSession(user):
         'unit_id': unit_id,
         'user_id': user_id
     }
-    db.sessions.insert(session)
+    db = connect()
+    cursor = db.cursor()
+    sql = "INSERT INTO SESSION(NAME) \
+       VALUES ('%s', '%s')" % (session['name'])
+    try:
+        # Execute the SQL command
+        cursor.execute(sql)
+        # Commit your changes in the database
+        db.commit()
+    except:
+        # Rollback in case there is any error
+        db.rollback()
+
+    # disconnect from server
+    db.close()
 
     return getAllSessionsOfUser(user)
 
@@ -153,11 +197,22 @@ def createUser():
             'name': request.json['name'],
             'mail': request.json['mail'],
             }
-    db.users.insert(user)
+    db = connect()
+    cursor = db.cursor()
+    sql = "INSERT INTO USER(NAME, EMAIL) \
+       VALUES ('%s', '%s')" % (user['name'], user['email'])
+    try:
+        # Execute the SQL command
+        cursor.execute(sql)
+        # Commit your changes in the database
+        db.commit()
+    except:
+        # Rollback in case there is any error
+        db.rollback()
+
+    # disconnect from server
+    db.close()
     return user
-
-
-app = Flask(__name__)
 
 
 if __name__ == '__main__':
