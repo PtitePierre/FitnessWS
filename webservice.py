@@ -158,7 +158,7 @@ def createSport():
     get_sport = "SELECT id FROM sport WHERE name LIKE '%s'" % (sport['name'])
     try:
         cursor.execute(get_sport)
-        sport_id = cursor.fetchone()
+        sport_id = cursor.fetchone()[0]
 
         for unit in units:
             unit_id = unit['unit_id']
