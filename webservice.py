@@ -161,7 +161,7 @@ def createSport():
 
         for unit in sport['units']:
             sql = "INSERT INTO sport_unit(sport_id, unit_id) \
-               VALUES ('%d', '%d')" % (sport_id, unit)
+               VALUES ('%d', '%d')" % (sport_id, unit['unit_id'])
             try:
                 cursor.execute(sql)
                 db.commit()
