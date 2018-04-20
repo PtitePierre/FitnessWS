@@ -143,6 +143,7 @@ def createSport():
         'name': request.json['name'].lower(),
     }
     units = request.json['units']
+    print(units)
 
     db = connect()
     cursor = db.cursor()
