@@ -40,17 +40,30 @@ def getAllUnits():
     db = connect()
     cursor = db.cursor()
 
-    sql = "SELECT * FROM unit"
+    sql = "SELECT id, name, code FROM unit"
     try:
         # Execute the SQL command
         cursor.execute(sql)
         # Fetch all the rows in a list of lists.
         results = cursor.fetchall()
         for row in results:
+
+            getSports = "SELECT id, sport_id FROM sport_unit \
+            WHERE unit_id = '%d'" % (row[0])
+            sports = []
+            try:
+                cursor.execute(getSports)
+                res = cursor.fetchall()
+                for row in res:
+                    sports.append(row[1])
+            except:
+                print("Error: unable to get sports id from sport_unit")
+
             unit = {
                 'id': row[0],
                 'name': row[1],
-                'code': row[2]
+                'code': row[2],
+                'sport': sports
             }
             units.append(unit)
     except:
@@ -67,7 +80,7 @@ def getAllUnits():
 def getAllSports():
     db = connect()
     cursor = db.cursor()
-    sql = "SELECT * FROM sport"
+    sql = "SELECT id, name FROM sport"
 
     sports = []
     try:
