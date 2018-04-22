@@ -33,7 +33,7 @@ def hello():
     return "Hello World !"
 
 
-# TO DO : GET Units
+# GET Units
 @app.route('/units', methods=['GET'])
 def getAllUnits():
     units = []
@@ -47,23 +47,10 @@ def getAllUnits():
         # Fetch all the rows in a list of lists.
         results = cursor.fetchall()
         for row in results:
-
-            getSports = "SELECT id, sport_id FROM sport_unit \
-            WHERE unit_id = '%d'" % (row[0])
-            sports = []
-            try:
-                cursor.execute(getSports)
-                res = cursor.fetchall()
-                for line in res:
-                    sports.append(line[1])
-            except:
-                print("Error: unable to get sports id from sport_unit")
-
             unit = {
                 'id': row[0],
                 'name': row[1],
                 'code': row[2],
-                'sports': sports
             }
             units.append(unit)
     except Exception as inst:
@@ -76,57 +63,7 @@ def getAllUnits():
     return jsonify({'units': units})
 
 
-# TO DO : GET SportType
-@app.route('/sports', methods=['GET'])
-def getAllSports():
-    db = connect()
-    cursor = db.cursor()
-    sql = "SELECT id, name FROM sport"
-
-    sports = []
-    try:
-        cursor.execute(sql)
-        results = cursor.fetchall()
-
-        for row in results:
-            sport = {
-                'id': row[0],
-                'name': row[1],
-            }
-            sports.append(sport)
-    except:
-        print("Error: unable to fecth data in sport")
-
-    db.close()
-    return jsonify({"sports": sports})
-
-
-# TO DO : GET Session with specific id
-@app.route('/sessions/<user>', methods=['GET'])
-def getAllSessionsOfUser(user):
-    userid = request.json['id']  # or user ~
-    db = connect()
-    cursor = db.cursor()
-    sql = "SELECT * FROM session WHERE user_id = '%d'" % (userid)
-    sessions = []
-
-    try:
-        cursor.execute(sql)
-        results = cursor.fetchall()
-
-        for row in results:
-            session = {
-                'id': row[0],
-                'name': row[1],
-            }
-            sessions.append(session)
-    except:
-        print("Error: unable to fecth data in session")
-
-    db.close()
-    return jsonify(sessions)
-
-
+# INSERT unit
 @app.route('/units', methods=['POST'])
 def createUnit():
     unit = {
@@ -148,6 +85,45 @@ def createUnit():
     return getAllUnits()
 
 
+# GET SportType
+@app.route('/sports', methods=['GET'])
+def getAllSports():
+    db = connect()
+    cursor = db.cursor()
+    sql = "SELECT id, name FROM sport"
+
+    sports = []
+    try:
+        cursor.execute(sql)
+        results = cursor.fetchall()
+
+        for row in results:
+
+            getUnits = "SELECT id, unit_id FROM sport_unit \
+            WHERE sport_id = '%d'" % (row[0])
+            units = []
+            try:
+                cursor.execute(getUnits)
+                res = cursor.fetchall()
+                for line in res:
+                    units.append(line[1])
+            except:
+                print("Error: unable to get units id from sport_unit")
+
+            sport = {
+                'id': row[0],
+                'name': row[1],
+                'units': units
+            }
+            sports.append(sport)
+    except:
+        print("Error: unable to fecth data in sport")
+
+    db.close()
+    return jsonify({"sports": sports})
+
+
+# INSERT sport
 @app.route('/sports', methods=['POST'])
 def createSport():
     sport = {
@@ -189,13 +165,88 @@ def createSport():
     return getAllSports()
 
 
-@app.route('/sessions/<user>', methods=['POST'])
+# TO DO : INSERT user
+@app.route('/users', methods=['POST'])
+def createUser():
+    user = {
+            'name': request.json['name'],
+            'mail': request.json['mail'],
+            'birthday': request.json['birthday'],
+            'h_pwd': request.json['pwd']
+            }
+    db = connect()
+    cursor = db.cursor()
+    sql = "INSERT INTO user(name, email, birthday, h_pwd) \
+       VALUES ('%s', '%s', '%s', '%s')"\
+       % (user['name'], user['email'], user['birthday'], user['h_pwd'])
+    try:
+        # Execute the SQL command
+        cursor.execute(sql)
+        # Commit your changes in the database
+        db.commit()
+    except:
+        # Rollback in case there is any error
+        db.rollback()
+
+    # disconnect from server
+    db.close()
+    return user
+
+
+# TO DO : GET Session with specific user's id
+@app.route('/sessions', methods=['POST'])
+def getAllSessionsOfUser(user):
+    userid = request.json['id']  # or user ~
+    db = connect()
+    cursor = db.cursor()
+    sql = "SELECT id, s_date, quantity, sport_unit_id FROM session \
+    WHERE user_id = '%d'" % (userid)
+    sessions = []
+
+    try:
+        cursor.execute(sql)
+        results = cursor.fetchall()
+
+        for row in results:
+            qtt = -1
+            sport = -1
+            get_sport_unit = "SELECT sport_id, unit_id FROM sport_unit \
+            WHERE id = '%d'" % (row[3])
+            try:
+                cursor.execute(get_sport_unit)
+                res = cursor.fetchall()
+                for line in res:
+                    sport = row[0]
+                    qtt = row[1]
+            except:
+                print("Error: unable to get sport & unit id from sport_unit")
+
+            session = {
+                'id': row[0],
+                'sDate': row[1],
+                'quantity': qtt,
+                'sport': sport
+            }
+            sessions.append(session)
+    except:
+        print("Error: unable to fecth data in session")
+
+    db.close()
+    return jsonify(sessions)
+
+
+# TO DO : INSERT session with specific user
+@app.route('/sessions', methods=['POST'])
 def createSession(user):
     """
     sport_id = db.sports.find({'name': request.json['sport_name']}).sport_id
     unit_id = db.units.find({'code': request.json['unit_code']}).unit_id
     user_id = db.users.find({'name': user}).user_id
     """
+    # from the method's body
+    # get the new session
+    # get the sending user
+
     session = {
         'id': request.json['id'],
         'sport_id': sport_id,
@@ -205,7 +256,7 @@ def createSession(user):
     }
     db = connect()
     cursor = db.cursor()
-    sql = "INSERT INTO session(name) \
+    sql = "INSERT INTO session(s_date,) \
        VALUES ('%s', '%s')" % (session['name'])
     try:
         # Execute the SQL command
@@ -220,30 +271,6 @@ def createSession(user):
     db.close()
 
     return getAllSessionsOfUser(user)
-
-
-@app.route('/users', methods=['POST'])
-def createUser():
-    user = {
-            'name': request.json['name'],
-            'mail': request.json['mail'],
-            }
-    db = connect()
-    cursor = db.cursor()
-    sql = "INSERT INTO user(name, email) \
-       VALUES ('%s', '%s')" % (user['name'], user['email'])
-    try:
-        # Execute the SQL command
-        cursor.execute(sql)
-        # Commit your changes in the database
-        db.commit()
-    except:
-        # Rollback in case there is any error
-        db.rollback()
-
-    # disconnect from server
-    db.close()
-    return user
 
 
 if __name__ == '__main__':
