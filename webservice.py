@@ -66,7 +66,8 @@ def getAllUnits():
                 'sport': sports
             }
             units.append(unit)
-    except:
+    except Exception as inst:
+        print(inst.args)
         print("Error: unable to fecth data in unit")
 
     # disconnect from server
