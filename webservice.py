@@ -54,8 +54,8 @@ def getAllUnits():
             try:
                 cursor.execute(getSports)
                 res = cursor.fetchall()
-                for row in res:
-                    sports.append(row[1])
+                for line in res:
+                    sports.append(line[1])
             except:
                 print("Error: unable to get sports id from sport_unit")
 
@@ -63,7 +63,7 @@ def getAllUnits():
                 'id': row[0],
                 'name': row[1],
                 'code': row[2],
-                'sport': sports
+                'sports': sports
             }
             units.append(unit)
     except Exception as inst:
