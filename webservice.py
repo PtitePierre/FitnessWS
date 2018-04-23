@@ -123,7 +123,7 @@ def getAllSports():
     return jsonify({"sports": sports})
 
 
-# INSERT sport
+# INSERT sport in sport db and linked units in sport_unit db
 @app.route('/sports', methods=['POST'])
 def createSport():
     sport = {
@@ -157,8 +157,8 @@ def createSport():
             except:
                 db.rollback()
     except Exception as inst:
-        print(inst.args)
         print("Error: unable to insert links between sport & unit")
+        print(inst.args)
 
     db.close()
 
@@ -168,39 +168,59 @@ def createSport():
 # TO DO : INSERT user
 @app.route('/users', methods=['POST'])
 def createUser():
-    user = {
-            'name': request.json['name'],
-            'mail': request.json['mail'],
-            'birthday': request.json['birthday'],
-            'h_pwd': request.json['pwd']
-            }
-    db = connect()
-    cursor = db.cursor()
-    sql = "INSERT INTO user(name, email, birthday, h_pwd) \
-       VALUES ('%s', '%s', '%s', '%s')"\
-       % (user['name'], user['email'], user['birthday'], user['h_pwd'])
-    try:
-        # Execute the SQL command
-        cursor.execute(sql)
-        # Commit your changes in the database
-        db.commit()
-    except:
-        # Rollback in case there is any error
-        db.rollback()
+    if(request.json['name'] != "" and
+       request.json['email'] != "" and
+       request.json['birthday'] != "" and
+       request.json['pwd'] != ""):
+        user = {
+                'name': request.json['name'],
+                'email': request.json['email'],
+                'birthday': request.json['birthday'],  # check format
+                'h_pwd': request.json['pwd']
+                }
+        db = connect()
+        cursor = db.cursor()
+        sql = "INSERT INTO user(name, email, birthday, h_pwd) \
+           VALUES ('%s', '%s', '%s', '%s')"\
+           % (user['name'], user['email'], user['birthday'], user['h_pwd'])
+        try:
+            # Execute the SQL command
+            cursor.execute(sql)
+            # Commit your changes in the database
+            db.commit()
+            # GET new user id
+            get_id = "SELECT id FROM user \
+            WHERE name LIKE '%s'" % (user['name'])
+            try:
+                cursor.execute(get_id)
+                user_id = cursor.fetchone()[0]
+                user.update({'id': user_id})
+            except:
+                print("Error: unable to get user id from user")
+                user.update({'id': 'ERR: unable to get user id'})
 
-    # disconnect from server
-    db.close()
+        except Exception as inst:
+            # Rollback in case there is any error
+            db.rollback()
+            print(inst.args)
+            user = {'ERR': 'unable to inser '+request.json['name']}
+
+        # disconnect from server
+        db.close()
+    else:
+        user = {'ERR': 'incomplet data'}
     return user
 
 
 # TO DO : GET Session with specific user's id
 @app.route('/sessions', methods=['POST'])
 def getAllSessionsOfUser(user):
-    userid = request.json['id']  # or user ~
+    user_id = request.json['user_id']  # or user ~
+    user_pwd = request.json['user_pwd']
     db = connect()
     cursor = db.cursor()
     sql = "SELECT id, s_date, quantity, sport_unit_id FROM session \
-    WHERE user_id = '%d'" % (userid)
+    WHERE user_id = '%d'" % (user_id)
     sessions = []
 
     try:
