@@ -82,7 +82,6 @@ def createUnit():
         print("Error: unable to insert unit")
 
     db.close()
-    return getAllUnits()
 
 
 # GET SportType
@@ -161,8 +160,6 @@ def createSport():
         print(inst.args)
 
     db.close()
-
-    return getAllSports()
 
 
 # TO DO : INSERT user
