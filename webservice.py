@@ -146,8 +146,8 @@ def createSport():
         cursor.execute(get_sport)
         sport_id = cursor.fetchone()[0]
 
-        for unit in units:
-            unit_id = unit['unit_id']
+        for unit_id in units:
+            # unit_id = unit['unit_id']
             sql = "INSERT INTO sport_unit(sport_id, unit_id) \
                VALUES ('%d', '%d')" % (sport_id, unit_id)
             try:
