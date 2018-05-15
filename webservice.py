@@ -172,11 +172,11 @@ def createSport():
 def createUser():
     if(request.json['name'] != "" and
        request.json['email'] != "" and
-       request.json['pwd'] != ""):
+       request.json['password'] != ""):
         user = {
                 'name': request.json['name'],
                 'email': request.json['email'],
-                'h_pwd': request.json['pwd']
+                'h_pwd': request.json['password']
                 }
         db = connect()
         cursor = db.cursor()
@@ -215,20 +215,27 @@ def createUser():
 # GET user_id
 @app.route('/users/<user_name>', methods=['GET'])
 def getUserID(user_name):
+
     db = connect()
     cursor = db.cursor()
-    sql = "SELECT id, name FROM user \
+    sql = "SELECT id, name, email, h_pwd FROM user \
     WHERE name = '%s'" % (user_name)
 
     try:
         cursor.execute(sql)
-        user_id = cursor.fetchone()[0]
+        res = cursor.fetchone()
+        user = {
+                "id": res[0],
+                "name": res[1],
+                "email": res[2],
+                "password": res[3]
+                }
 
     except:
         print("Error: unable to fecth data in sport")
 
     db.close()
-    return jsonify({'Id': user_id})
+    return jsonify(user)
 
 
 ###############################################################################
