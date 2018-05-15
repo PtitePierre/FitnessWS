@@ -286,7 +286,6 @@ def getAllSessionsOfUser(user_id):
 # TO DO : INSERT session with specific user
 @app.route('/sessions', methods=['POST'])
 def createSession():
-    print("### NEW SESSION ###")
     err = 201
     # from the method's body
     # get the new session
@@ -332,7 +331,6 @@ def createSession():
         err = 404
     # disconnect from server
     db.close()
-    print("## END OF CREATE SESSION ##")
     return getAllSessionsOfUser(user_id)
 
 
