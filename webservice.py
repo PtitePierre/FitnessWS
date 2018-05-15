@@ -209,7 +209,7 @@ def createUser():
         db.close()
     else:
         user = {'ERR': 'incomplet data'}
-    return user
+    return jsonify(user)
 
 
 # GET user_id
