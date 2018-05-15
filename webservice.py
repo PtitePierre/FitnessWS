@@ -236,10 +236,11 @@ def getUserID(user_name):
 @app.route('/sessions/<user_id>', methods=['GET'])
 def getAllSessionsOfUser(user_id):
 
+    usr = int(user_id)
     db = connect()
     cursor = db.cursor()
     sql = "SELECT id, sport_unit_id, s_date, quantity, user_id, done, weight, wunit \
-    FROM session WHERE user_id = '%d'" % (user_id)
+    FROM session WHERE user_id = '%d'" % (usr)
     sessions = []
 
     try:
