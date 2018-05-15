@@ -167,19 +167,17 @@ def createSport():
 def createUser():
     if(request.json['name'] != "" and
        request.json['email'] != "" and
-       request.json['birthday'] != "" and
        request.json['pwd'] != ""):
         user = {
                 'name': request.json['name'],
                 'email': request.json['email'],
-                'birthday': request.json['birthday'],  # check format
                 'h_pwd': request.json['pwd']
                 }
         db = connect()
         cursor = db.cursor()
-        sql = "INSERT INTO user(name, email, birthday, h_pwd) \
-           VALUES ('%s', '%s', '%s', '%s')"\
-           % (user['name'], user['email'], user['birthday'], user['h_pwd'])
+        sql = "INSERT INTO user(name, email, h_pwd) \
+           VALUES ('%s', '%s', '%s')"\
+           % (user['name'], user['email'], user['h_pwd'])
         try:
             # Execute the SQL command
             cursor.execute(sql)
@@ -209,11 +207,29 @@ def createUser():
     return user
 
 
+# GET user_id
+@app.route('/users/<user_name>', methods=['GET'])
+def getUserID(user_name):
+    db = connect()
+    cursor = db.cursor()
+    sql = "SELECT id, name FROM user \
+    WHERE name = '%s'" % (user_name)
+
+    try:
+        cursor.execute(sql)
+        user_id = cursor.fetchone()[0]
+
+    except:
+        print("Error: unable to fecth data in sport")
+
+    db.close()
+    return user_id
+
+
 # TO DO : GET Session with specific user's id
-@app.route('/sessions', methods=['POST'])
-def getAllSessionsOfUser(user):
-    user_id = request.json['user_id']  # or user ~
-    user_pwd = request.json['user_pwd']
+@app.route('/sessions/<user_id>', methods=['POST'])
+def getAllSessionsOfUser(user_id):
+
     db = connect()
     cursor = db.cursor()
     sql = "SELECT id, s_date, quantity, sport_unit_id FROM session \
