@@ -238,15 +238,13 @@ def getUserID(user_name):
     return jsonify(user)
 
 
-###############################################################################
 # TO DO : GET Session with specific user's id
 @app.route('/sessions/<user_id>', methods=['GET'])
 def getAllSessionsOfUser(user_id):
-
     usr = int(user_id)
     db = connect()
     cursor = db.cursor()
-    sql = "SELECT id, sport_unit_id, s_date, quantity, user_id, done, weight, wunit \
+    sql = "SELECT id, sport_unit_id, s_date, quantity, done, weight, wunit \
     FROM session WHERE user_id = '%d'" % (usr)
     sessions = []
 
@@ -272,9 +270,9 @@ def getAllSessionsOfUser(user_id):
                 'sunit_id': unit_id,
                 'sDate': row[2],
                 'stype_id': sport_id,
-                'done': row[5],
-                'weight': row[6],
-                'wunit': row[7],
+                'done': row[4],
+                'weight': row[5],
+                'wunit': row[6],
                 'user_id': user_id,
             }
             sessions.append(session)
@@ -288,6 +286,7 @@ def getAllSessionsOfUser(user_id):
 # TO DO : INSERT session with specific user
 @app.route('/sessions', methods=['POST'])
 def createSession():
+    print("### NEW SESSION :" + request)
     err = 201
     # from the method's body
     # get the new session
@@ -317,31 +316,23 @@ def createSession():
     sql = "INSERT INTO session \
         (s_date, quantity, user_id, sport_unit_id, done, weight, wunit) \
         VALUES \
-        ('%s', '%d', '%d', '%d', '%d', '%d', '%s')" % (
-        s_date,
-        quantity,
-        user_id,
-        sport_unit_id,
-        done,
-        weight,
-        wunit)
+        ('%s', '%d', '%d', '%d', '%d', '%d', '%s')" % (s_date, quantity,
+        user_id, sport_unit_id, done, weight, wunit)
+
     try:
         # Execute the SQL command
         cursor.execute(sql)
         # Commit your changes in the database
         db.commit()
+        print("## OK NEW SESSION ADDED")
     except:
         # Rollback in case there is any error
         db.rollback()
         print("Error: unable to insert new session")
         err = 404
-
     # disconnect from server
     db.close()
-
-    # return jsonify({'ERR': err})
     return getAllSessionsOfUser(user_id)
-###############################################################################
 
 
 if __name__ == '__main__':
