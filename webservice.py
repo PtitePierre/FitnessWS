@@ -233,7 +233,7 @@ def getUserID(user_name):
 
 ###############################################################################
 # TO DO : GET Session with specific user's id
-@app.route('/sessions/<user_id>', methods=['POST'])
+@app.route('/sessions/<user_id>', methods=['GET'])
 def getAllSessionsOfUser(user_id):
 
     db = connect()
@@ -309,7 +309,7 @@ def createSession():
     sql = "INSERT INTO session \
         (s_date, quantity, user_id, sport_unit_id, done, weight, wunit) \
         VALUES \
-        ('%d', '%d', '%d', '%d', '%d', '%d', '%s')" % (
+        ('%s', '%d', '%d', '%d', '%d', '%d', '%s')" % (
         s_date,
         quantity,
         user_id,
