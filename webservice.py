@@ -125,6 +125,7 @@ def getAllSports():
 # INSERT sport in sport db and linked units in sport_unit db
 @app.route('/sports', methods=['POST'])
 def createSport():
+    err = 201
     sport = {
         'name': request.json['name'].lower(),
     }
@@ -140,6 +141,7 @@ def createSport():
     except:
         db.rollback()
         print("Error: unable to insert sport")
+        err = 404
 
     get_sport = "SELECT id FROM sport WHERE name LIKE '%s'" % (sport['name'])
     try:
@@ -155,11 +157,14 @@ def createSport():
                 db.commit()
             except:
                 db.rollback()
+                err = 404
     except Exception as inst:
         print("Error: unable to insert links between sport & unit")
         print(inst.args)
+        err = 404
 
     db.close()
+    return jsonify({'ERR': err})
 
 
 # TO DO : INSERT user
@@ -198,7 +203,7 @@ def createUser():
             # Rollback in case there is any error
             db.rollback()
             print(inst.args)
-            user = {'ERR': 'unable to inser '+request.json['name']}
+            user = {'ERR': 'unable to insert '+request.json['name']}
 
         # disconnect from server
         db.close()
@@ -223,9 +228,10 @@ def getUserID(user_name):
         print("Error: unable to fecth data in sport")
 
     db.close()
-    return user_id
+    return jsonify({'Id': user_id})
 
 
+###############################################################################
 # TO DO : GET Session with specific user's id
 @app.route('/sessions/<user_id>', methods=['POST'])
 def getAllSessionsOfUser(user_id):
@@ -304,6 +310,7 @@ def createSession(user):
     db.close()
 
     return getAllSessionsOfUser(user)
+###############################################################################
 
 
 if __name__ == '__main__':
