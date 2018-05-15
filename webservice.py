@@ -332,6 +332,7 @@ def createSession():
         err = 404
     # disconnect from server
     db.close()
+    print("## END OF CREATE SESSION ##")
     return getAllSessionsOfUser(user_id)
 
 
