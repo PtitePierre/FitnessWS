@@ -309,7 +309,7 @@ def createSession():
     sql = "INSERT INTO session \
         (s_date, quantity, user_id, sport_unit_id, done, weight, wunit) \
         VALUES \
-        ('%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s')" % (
+        ('%d', '%d', '%d', '%d', '%d', '%d', '%d', '%s')" % (
         s_date, quantity, user_id, sport_unit_id, done, weight, wunit)
     try:
         # Execute the SQL command
