@@ -238,8 +238,8 @@ def getAllSessionsOfUser(user_id):
 
     db = connect()
     cursor = db.cursor()
-    sql = "SELECT id, s_date, quantity, sport_unit_id FROM session \
-    WHERE user_id = '%d'" % (user_id)
+    sql = "SELECT id, sport_unit_id, s_date, quantity, user_id, done, weight, wunit \
+    FROM session WHERE user_id = '%d'" % (user_id)
     sessions = []
 
     try:
@@ -247,24 +247,27 @@ def getAllSessionsOfUser(user_id):
         results = cursor.fetchall()
 
         for row in results:
-            qtt = -1
-            sport = -1
             get_sport_unit = "SELECT sport_id, unit_id FROM sport_unit \
-            WHERE id = '%d'" % (row[3])
+            WHERE id = '%d'" % (row[1])
             try:
                 cursor.execute(get_sport_unit)
                 res = cursor.fetchall()
                 for line in res:
-                    sport = row[0]
-                    qtt = row[1]
+                    sport_id = line[0]
+                    unit_id = line[1]
             except:
                 print("Error: unable to get sport & unit id from sport_unit")
 
             session = {
                 'id': row[0],
-                'sDate': row[1],
-                'quantity': qtt,
-                'sport': sport
+                'quantity': row[3],
+                'sunit_id': unit_id,
+                'sDate': row[2],
+                'stype_id': sport_id,
+                'done': row[5],
+                'weight': row[6],
+                'wunit': row[7],
+                'user_id': user_id,
             }
             sessions.append(session)
     except:
@@ -276,27 +279,38 @@ def getAllSessionsOfUser(user_id):
 
 # TO DO : INSERT session with specific user
 @app.route('/sessions', methods=['POST'])
-def createSession(user):
-    """
-    sport_id = db.sports.find({'name': request.json['sport_name']}).sport_id
-    unit_id = db.units.find({'code': request.json['unit_code']}).unit_id
-    user_id = db.users.find({'name': user}).user_id
-    """
+def createSession():
+    err = 201
     # from the method's body
     # get the new session
     # get the sending user
+    sport_id = request.json['stype_id']
+    unit_id = request.json['sunit_id']
+    user_id = request.json['user_id']
+    s_date = request.json['sdate']
+    quantity = request.json['quantity']
+    weight = request.json['weight']
+    wunit = request.json['wunit']
+    done = request.json['done']
 
-    session = {
-        'id': request.json['id'],
-        'sport_id': sport_id,
-        'quantity': request.json['quantity'].lower(),
-        'unit_id': unit_id,
-        'user_id': user_id
-    }
     db = connect()
     cursor = db.cursor()
-    sql = "INSERT INTO session(s_date,) \
-       VALUES ('%s', '%s')" % (session['name'])
+
+    sql_id_sportunit = "SELECT id FROM sport_unit \
+        WHERE sport_id = '%d' AND unit_id = '%d'" % (sport_id, unit_id)
+
+    try:
+        cursor.execute(sql_id_sportunit)
+        sport_unit_id = cursor.fetchone()[0]
+    except:
+        print("Error: unable to get sport_unit_id")
+        err = 404
+
+    sql = "INSERT INTO session \
+        (s_date, quantity, user_id, sport_unit_id, done, weight, wunit) \
+        VALUES \
+        ('%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s')" % (
+        s_date, quantity, user_id, sport_unit_id, done, weight, wunit)
     try:
         # Execute the SQL command
         cursor.execute(sql)
@@ -305,11 +319,14 @@ def createSession(user):
     except:
         # Rollback in case there is any error
         db.rollback()
+        print("Error: unable to insert new session")
+        err = 404
 
     # disconnect from server
     db.close()
 
-    return getAllSessionsOfUser(user)
+    # return jsonify({'ERR': err})
+    return getAllSessionsOfUser(user_id)
 ###############################################################################
 
 
