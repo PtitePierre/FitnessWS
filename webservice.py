@@ -320,7 +320,7 @@ def createSession():
     """
     sql = "INSERT INTO session \
         (s_date, quantity, user_id, sport_unit_id, done, weight, wunit) \
-        VALUES (\""+str(s_date)+"\","+str(quantity)+","+str(user_id)+","+str(sport_unit_id)+","+str(done)+","+str(weight)+",\""+str(wunit)+"\")"
+        VALUES (\""+s_date+"\","+str(quantity)+","+str(user_id)+","+str(sport_unit_id)+","+str(done)+","+str(weight)+",\""+str(wunit)+"\")"
     
     print(sql)
 
