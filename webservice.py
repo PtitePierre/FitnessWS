@@ -311,12 +311,16 @@ def createSession():
     except:
         print("Error: unable to get sport_unit_id")
         err = 404
-
+    """
     sql = "INSERT INTO session \
         (s_date, quantity, user_id, sport_unit_id, done, weight, wunit) \
         VALUES \
         ('%s', '%d', '%d', '%d', '%d', '%d', '%s')" % (s_date, quantity,
         user_id, sport_unit_id, done, weight, wunit)
+    """
+    sql = "INSERT INTO session \
+        (s_date, quantity, user_id, sport_unit_id, done, weight, wunit) \
+        VALUES ("+s_date+","+quantity+","+user_id+","+sport_unit_id+","+done+","+weight+","+wunit+")"
     
     print(sql)
 
