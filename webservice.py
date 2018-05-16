@@ -317,6 +317,8 @@ def createSession():
         VALUES \
         ('%s', '%d', '%d', '%d', '%d', '%d', '%s')" % (s_date, quantity,
         user_id, sport_unit_id, done, weight, wunit)
+    
+    print(sql)
 
     try:
         # Execute the SQL command
