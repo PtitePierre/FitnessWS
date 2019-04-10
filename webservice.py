@@ -7,6 +7,9 @@ from flask.ext.mysql import MySQL
 
 app = Flask(__name__)
 
+# TODO : remplacer les print de debugg par des ecritures fichier
+# --> fichier de logging/debugg pour conserver des traces du fonctionnement
+# ajouter des commentaires clairs > doc string
 
 def connect():
     """connect user to DataBase on host"""
